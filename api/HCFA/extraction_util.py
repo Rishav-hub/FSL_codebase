@@ -1,6 +1,6 @@
 import json
 import torch
-import random
+import io
 import torchvision
 import pandas as pd
 from torchvision.io import read_image
@@ -202,7 +202,9 @@ class HCFARoiPredictor:
 
         class_names = [self.category_mapping[label_id] for label_id in labels_flat]
         num_predictions = len(boxes_flat)
-        file_name = [image_path.split(".")[0]] * num_predictions
+        # file_name = [image_path.split(".")[0]] * num_predictions
+        file_name = [image_path] * num_predictions
+
 
         infer_df = pd.DataFrame({
             'file_name': file_name,
@@ -378,16 +380,15 @@ processor, model = load_model(device)
 
 
 
-def run_hcfa_pipeline(image_path: str):
+def run_hcfa_pipeline(image_path: str, file_name: str):
     try:
         # image_path = os.path.join(input_image_folder, each_image)
-        pil_image = Image.open(image_path).convert('RGB')
+        # pil_image = Image.open(image_path).convert('RGB')
+        pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
         to_tensor = transforms.ToTensor()
         image = to_tensor(pil_image)
         prediction, output = run_prediction_donut(pil_image, model, processor)
         donut_out = convert_hcfa_predictions_to_df(prediction)
-
-        # print(donut_out)
 
         # What is this? Is it Mapping the donut keys to XML values? Can't understand.
         for old_key, new_key in reverse_mapping_dict.items():
@@ -414,7 +415,7 @@ def run_hcfa_pipeline(image_path: str):
                 output_dict_donut[key] = [{'value': value}]
 
         # This is just doing the ROI inference and converting DF to dict
-        res = roi_model_inference(image_path, image)
+        res = roi_model_inference(file_name, image)
         df_dict = res.to_dict(orient='records')
 
         # Implementing the average part here
