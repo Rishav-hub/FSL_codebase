@@ -36,6 +36,7 @@ async def ml_extraction(data: dict):
             raise HTTPException(status_code=400, detail=f"File not found: {image_file_path}")
 
         result, error = run_ub_pipeline(image_file_path)
+        print(error)
 
         if error:
             # If there's an error, raise HTTPException with status code 500 (Internal Server Error)
@@ -47,6 +48,8 @@ async def ml_extraction(data: dict):
         return JSONResponse(content=response_data)
 
     except Exception as e:
+        print(e)
+
         print(f"Error occured while processing {e} >>> ")
         return JSONResponse(
             status_code=500,
@@ -54,5 +57,5 @@ async def ml_extraction(data: dict):
         )
 
 if __name__ == '__main__':
-    uvicorn.run("app:app", host="0.0.0.0", port=5001)
+    uvicorn.run("app:app", host="0.0.0.0", port=5002)
 
