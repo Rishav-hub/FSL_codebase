@@ -25,7 +25,7 @@ warnings.filterwarnings('ignore')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\UB\artifacts\notes.json'
 MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\UB\artifacts\ub__100.pth'
-ADA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\UB\artifacts\FSL_Forms_Keys.xlsx"
+UB_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\UB\artifacts\FSL_Forms_Keys.xlsx"
 UB_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\UB\artifacts\average_coordinates_ub.xlsx"
 BBOX_DONUT_Mapping_Dict = {'1_Bill_Prov_Details': ['1_BillProvAddr1',
   '1_BillProvCity',
@@ -240,7 +240,7 @@ BBOX_DONUT_Mapping_Dict = {'1_Bill_Prov_Details': ['1_BillProvAddr1',
   '81D_AddtlCodeInd',
   '81D_AddtlCodeValue']}
 average_coordinates_ub_df = pd.read_excel(UB_AVERAGE_COORDINATE_PATH)
-key_mapping = pd.read_excel(ADA_FORM_KEY_MAPPING)
+key_mapping = pd.read_excel(UB_FORM_KEY_MAPPING)
 mapping_dict = key_mapping.set_index('Key_Name').to_dict()['Modified_key']
 reverse_mapping_dict = {v: k for k, v in mapping_dict.items()}
 
