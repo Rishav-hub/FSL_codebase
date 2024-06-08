@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 *.zip
 docs/
+api/ADA/artifacts/
+api/HCFA/artifacts
+api/HCFA_RD/artifacts/
+api/UB/artifact/
