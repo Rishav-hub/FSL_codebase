@@ -1,0 +1,30 @@
+2024-05-07 09:15:18 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BSC415LJD001_000.Tiff'}
+2024-05-07 09:15:18 INFO     Image file path in the server /mnt/win_share2/Xelp/BSC415LJD001_000.Tiff
+2024-05-07 09:15:18 INFO     Starting to run prediction on Donut >>>
+2024-05-07 09:15:18 INFO     Running Donut tokenization
+2024-05-07 09:15:18 INFO     Running Donut generate function
+2024-05-07 09:15:20 INFO     >> Completed prediction on Donut
+2024-05-07 09:15:20 INFO     Converting Donut prediction to dataframe
+2024-05-07 09:15:20 INFO     Converting donut output to a structured format
+2024-05-07 09:15:20 INFO     Started ROI Model Inference >>
+2024-05-07 09:15:20 INFO     Running ROI prediction
+2024-05-07 09:15:20 INFO     Applying NMS to the prediction
+2024-05-07 09:15:20 INFO     Post-processing the output 
+2024-05-07 09:15:20 INFO     >> Completed ROI Model Inference
+2024-05-07 09:15:20 INFO     Structuring ROI output
+2024-05-07 09:15:20 INFO     Mapping output with the required keys
+2024-05-07 09:15:21 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BSC4N489DE048_000.Tiff'}
+2024-05-07 09:15:21 INFO     Image file path in the server /mnt/win_share2/Xelp/BSC4N489DE048_000.Tiff
+2024-05-07 09:15:21 INFO     Starting to run prediction on Donut >>>
+2024-05-07 09:15:21 INFO     Running Donut tokenization
+2024-05-07 09:15:21 INFO     Running Donut generate function
+2024-05-07 09:15:24 INFO     >> Completed prediction on Donut
+2024-05-07 09:15:24 INFO     Converting Donut prediction to dataframe
+2024-05-07 09:15:24 INFO     Converting donut output to a structured format
+2024-05-07 09:15:24 INFO     Started ROI Model Inference >>
+2024-05-07 09:15:24 INFO     Running ROI prediction
+2024-05-07 09:15:24 INFO     Applying NMS to the prediction
+2024-05-07 09:15:24 INFO     Post-processing the output 
+2024-05-07 09:15:24 INFO     >> Completed ROI Model Inference
+2024-05-07 09:15:24 INFO     Structuring ROI output
+2024-05-07 09:15:24 INFO     Mapping output with the required keys

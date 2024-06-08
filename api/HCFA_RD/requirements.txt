@@ -3,8 +3,10 @@ torch
 torchvision 
 pandas
 transformers
---index-url https://download.pytorch.org/whl/cu121
+# --index-url https://download.pytorch.org/whl/cu121
 
+# Classifier
+fastai==2.7.14
 
 # API
 fastapi==0.99.1

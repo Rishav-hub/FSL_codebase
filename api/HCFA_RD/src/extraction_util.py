@@ -1,6 +1,6 @@
 import json
 import torch
-import random
+import io
 import torchvision
 import pandas as pd
 from torchvision.io import read_image
@@ -15,87 +15,110 @@ import json
 from PIL import Image
 import torch
 import argparse
-import os
+# import os
 import warnings
-from tqdm import tqdm
+# from tqdm import tqdm
 
-from logger import ada_logger
+
 warnings.filterwarnings('ignore')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CATEGORY_MAPPING_PATH = '/Data/FSl_ML/FSL_codebase/api/ADA/artifacts/notes.json'
+CATEGORY_MAPPING_PATH = r'/Data/FSl_ML/FSL_codebase/api/HCFA_RD/artifacts/notes.json'
 
-MODEL_PATH = '/Data/FSl_ML/FSL_codebase/api/ADA/artifacts/ada__88.pth'
+MODEL_PATH = r'/Data/FSl_ML/FSL_codebase/api/HCFA_RD/artifacts/hcfa__94.pth'
 
-ADA_FORM_KEY_MAPPING = "/Data/FSl_ML/FSL_codebase/api/ADA/artifacts/FSL_Forms_Keys.xlsx"
+HCFA_FORM_KEY_MAPPING = r"/Data/FSl_ML/FSL_codebase/api/HCFA_RD/artifacts/HCFA_Keys_All.xlsx"
 
-BBOX_DONUT_Mapping_Dict = {
-    "1_Type_of_Transaction":["DEN_TransTypeStmtOfServ","DEN_TransTypeReqforPreAuth","DEN_TransTypeEPSDT"],
-    "2_Pre_Number": "DEN_PreAuthNum",
-    "3_Company_address":["DEN_PayerAddr1","DEN_PayerCity","DEN_PayerPostCodeExt", "DEN_PayerOrgName",\
-                         "DEN_PayerFName","DEN_PayerLName", "DEN_PayerPhoneNumber", "DEN_PayerState", "DEN_PayerPostCode"],
-    "4_Other_Coverage":["DEN_IsThereSecInsN","DEN_IsThereSecInsY", "DEN_IsThereSecIns"],
-    "5_Name": "DEN_SecInsFullName",
-    "6_DOB":"DEN_SecInsDOB",
-    "7_Gender":["DEN_SecInsSexF","DEN_SecInsSexM"],
-    "8_SSN": "DEN_SecInsIDNumber",
-    "9_Plan_Number":"DEN_SecInsPolGrpNumber",
-    "10_Relationship":["DEN_SecRelShipDep","DEN_SecRelShipOther", "DEN_SecRelShipSelf", "DEN_SecRelShipSpouse"],
-    "11_Company_or_plan": ["DEN_SecInsOrgName","DEN_SecInsAddr1","DEN_SecInsCity", "DEN_SecPostCodeExt", "DEN_SecPhoneNumber", \
-                           "DEN_SecInsState", "DEN_SecInsPostCode"],
-    "12_Policyholder_details":["DEN_PriInsAddr1", "DEN_PriInsCity","DEN_PriInsFullName", "DEN_PriInsState", \
-                               "DEN_PriInsPostCode"],
-    "13_DOB":"DEN_PriInsDOB",
-    "14_Gender":["DEN_PriInsSexF","DEN_PriInsSexM"],
-    "15_SSN":"DEN_PriInsIDNumber",
-    "16_Plan_Number":"DEN_PriInsPolGrpNumber",
-    "17_Employer_Name":["DEN_PriInsPlanName","DEN_PriInsEmpName"],
-    "18_Relationship":["DEN_PatRelShipDep","DEN_PatRelShipOther","DEN_PatRelShipSelf","DEN_PatRelShipSpouse"],
-    "19_Use":["DEN_PatStudentStatusCodeFT", "DEN_PatStudentStatusCodePT"],
-    "20_Name":["DEN_PatAddr1","DEN_PatCity","DEN_PatFullName","DEN_PatState", "DEN_PatPostCode"],
-    "21_DOB":"DEN_PatDOB",
-    "22_Gender":["DEN_PatSexF","DEN_PatSexM"],
-    "23_Patient_ID":"DEN_PatAcctNo",
-    "24_31_Table":["DEN_DOS","DEN_CavityArea","DEN_ToothSystem","DEN_ToothId","DEN_ToothSurface","DEN_ProcCode",\
-                   "DEN_Units", "DEN_ProcDesc", "DEN_LineCharges"],
-    "31_A_Other_Fee":"DEN_OtherCharges",
-    "32_Total_Fee":"DEN_TotalCharges",
-    "33_Missing_Teeth":"DEN_MissingTooth",
-    "34_A_Diag_Codes":"21_ICDInd",
-    "34_Code_list_Qualifier": "DEN_DiagCodeQual",
-    "35_Remarks":["DEN_Remarks", "DEN_CHCCNum", "DEN_CHCNum", "DEN_DXCNum", "DEN_NEANum"],
-    "36_Signature":["DEN_PatSignonFile", "DEN_PatSignDate"],
-    "37_Signature":["DEN_PriSignonFile", "DEN_PriSignDate"],
-    "38_Place_of_treatment":"DEN_PlaceOfTreatment",
-    "39_Enclosures":"DEN_Encloseure",
-    "40_Orthodontics":["DEN_OrthodonticsN","DEN_OrthodonticsY"],
-    "41_Date":"DEN_DateAppliancePlaced",
-    "42_Months_remaining":"DEN_MnthsOfTrmntRemain",
-    "43_Prosthesis":["DEN_RplProsthesisN","DEN_RplProsthesisY"],
-    "44_Date":"DEN_DatePriorPlacement",
-    "45_Treatment_resulting_form":["DEN_PatConditionAuto", "DEN_PatConditionEmp", "DEN_PatConditionOther"],
-    "46_Date_of_accident":"DEN_DateOfAccident",
-    "47_Auto_Accident_state":"DEN_AutoAccidentState" ,
-    "48_Dentist_Address": ["DEN_BillProvAddr1", "DEN_BillProvCity", "DEN_BillProvFullName", "DEN_BillProvOrgName",\
-                           "DEN_BillProvPrefix", "DEN_BillProvState", "DEN_BillProvSuffix", "DEN_BillProvPostCode"],
-    "49_NPI":"DEN_BillProvNPI",
-    "50_Licence_Number": "DEN_BillProvLicenseId",
-    "51_SSN_TIN": "DEN_BillProvFedIdCode",
-    "52_A_Addl_Provider_id": "DEN_FacProvOtherIdFull",
-    "52_Phone_Number":"DEN_BillProvPhone",
-    "53_Signature": ["DEN_FacProvOrgName", "DEN_FacProvSignOnFile", "DEN_FacProvSignDate"],
-    "54_NPI": "DEN_FacProvNPI",
-    "55_Licence_Number": "DEN_FacProvLicenseId",
-    "56_Address":["DEN_FacProvAddr1","DEN_FacProvCity", "DEN_FacProvState", "DEN_FacProvPostCode", "DEN_FacProvSpecialtyCode"],
-    "57_Phone_Number":"DEN_FacProvPhone",
-    "58_Addl_provider_id":"DEN_FacProvPhone"
+HCFA_AVERAGE_COORDINATE_PATH = r"/Data/FSl_ML/FSL_codebase/api/HCFA_RD/artifacts/average_coordinates_hcfa.xlsx"
+
+BBOX_HCFA_DONUT_Mapping_Dict = {
+"10. IS PATIENT’S CONDITION RELATED TO:": ["10A_PatConditionEmpN", "10A_PatConditionEmpY", "10B_PatConditionAutoN",\
+                                           "10B_PatConditionAutoY","10C_PatConditionOtherN","10C_PatConditionOtherY"],
+"10D_Claim_Codes": "10D_ClaimCodes",
+"11. INSURED’S POLICY GROUP OR FECA NUMBER": "11_PriInsPolGrpNumber",
+"11. d. IS THERE ANOTHER HEALTH BENEFIT PLAN?": ["11D_PriInsOtherPlanN", "11D_PriInsOtherPlanY"],
+"11A_Ins_DOB":  "11A_PriInsDOB",
+"11B_Other_Claim_Id": ["11B_OtherClaimIdCode", "11B_OtherClaimIdCodeQual"],
+"11C_Ins_Plan_Name": "11C_PriInsPlanName",
+"12_Patient_Auth_Sign": "12_PatSignonFile",
+"13. INSURED’S OR AUTHORIZED PERSON’S SIGNATURE":  "13_PriSignonFileList", 
+"14. DATE OF CURRENT": ["14_PatCurrentDate","14_PatCurrentDateQual"],
+"15_Other_Date": ["15_PatFirstDateOfIllQual"],
+"16_Date": "16_Date",
+"17. NAME OF REFERRING PHYSICIAN OR OTHER SOURCE": ["17_RefProvFullName", "17_RefProvOrgName"],
+"17a. Qual": ["17A_RefProvOtherId", "17A_RefProvOtherIdQual"],
+"17b. NPI": "17B_RefProvNPI",
+"19. Additional Claim Information": ["19A_ProvCredential", "19A_ProvFName", "19A_ProvLName",\
+                "19A_ProvMI", "19A_ProvPrefix", "19A_ProvFullNameQual", "19A_ProvSuffix", \
+                "19B_ProvCredential", "19B_ProvFName", "19B_ProvLName", "19B_ProvMI",\
+                "19B_ProvPrefix", "19B_ProvFullNameQual", "19B_ProvSuffix"],
+"19_Hospitalization_Date": ['Box19B_Provider', 'Box19B_NPI', 'Box19A_QQ', 'Box19A_Provider', 'Box19A_NPI', '19_LocalUse'],
+"1_InsType":  "1_InsType",
+"1a. INSURED’S I.D. NUMBER": "1A_PriInsIDNumber",
+"2. PATIENT’S NAME (Last Name, First Name, Middle Initial)": "2_PatFullName",
+"20_Outside_Lab": ["20_Outside_Lab", "MissApp"],
+"21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY.": ["21_DiagDescription","21_DiagCode", "21_ICDInd"],
+"22. MEDICAID RESUBMISSION CODE and Original Ref No": ["22_MedicaidCode", "22_MedicaidRefNum"],
+"23. PRIOR AUTHORIZATION NUMBER": "23_PriorAuthNum",
+"24. Table": ["24_HCT", "24_MedicaidPaidAmount", "24_NDC", "24_NDCUnits", "24_NDCUnitsQual", "24_ProcDesc", "24_NDCCharges","24_NDCQualifier",\
+              "24_ClmTaxAmount", "24A_FromDate", "24A_ToDate", "24B_POS", "24C_EMG", "24D_Modifier", "24D_ProcCode",\
+                "24E_DiagPtr", "24F_LineCharges", "24G_Units", "24H_EPSDT", "24H_EPSDT1", "24J_RenProvNPIId", \
+                "24J_RenProvOtherId", "24_ClmNYSurChargeAmount", "24_ClmDiscountAmount"],
+"25. FEDERAL TAX I.D. NUMBER_SSN_EIN": ["25_BillProvFedIdCode", "25_BillProvEIN", "25_BillProvSSN"],
+"26. PATIENT’S ACCOUNT NO.": "26_PatAcctNo", 
+"27. ACCEPT ASSIGNMENT?": ["27_AcceptAssignmentN", "27_AcceptAssignmentY"],
+"28. TOTAL CHARGE": "28_TotalCharges",
+"29. AMOUNT PAID":"29_AmountPaid",
+"3. PATIENT’S BIRTH DATE": ["3_PatSexF", "3_PatSexM", "3_PatDOB"],
+"30_Reserved_NUCC": "30_BalanceDue",
+"31. SIGNATURE OF PHYSICIAN OR SUPPLIER  INCLUDING DEGREES OR CREDENTIALS": ["31_RenProvTaxonomyCode", \
+                                                                             "31_PrnRenProvFullName", "31_RenProvOrgName"],
+"32. SERVICE FACILITY LOCATION INFORMATION": ["32_AmbToFacProvAddr1" ,"32_AmbToFacProvAddr2", "32_AmbToFacProvCity",\
+                "32_AmbToFacProvCredential", "32_AmbToFacProvFName" , "32_AmbToFacProvFullPost", "32_AmbToFacProvLName",\
+                "32_MedicaidTaxId", "32_AmbToFacProvMI", "32_AmbToFacProvNPIId", "32_AmbToFacProvOrgName", \
+                "32_AmbToFacProvOtherId", "32_AmbToFacProvOtherIdFull", "32_AmbToFacProvPostCode", \
+                "32_AmbToFacProvPostCode5", "32_AmbToFacProvPostCodeExt", "32_AmbToFacProvPrefix", "32_FacProvOrgName", \
+                "32_FacProvAddr1", "32_FacProvCity", "32_FacProvCredential", "32_FacProvFName", "32_FacProvLName", \
+                "32_FacProvMI", "32_FacProvNPIId", "32_FacProvOtherId", "32_FacProvOtherIdFull", "32_FacProvPostCode", \
+                "32_FacProvPrefix", "32_FacProvState", "32_FacProvSuffix", "32_AmbToFacProvState", "32_AmbToFacProvSuffix"],
+"32A_NPI_Code": "32_FacProvNPIId",
+"32B_Code": "32_FacProvOtherId", 
+"33. PHYSICIAN’S, SUPPLIER’S BILLING NAME, ADDRESS": ["33_BillProvAddr1", "33_BillProvCity","33_BillProvFullName",\
+"33_MedicaidTaxId","33_MediBillProvAddr1","33_MediBillProvAddr2","33_MediBillProvCity","33_MediBillProvCredential",\
+"33_MediBillProvFName","33_MediBillProvFullPost","33_MediBillProvLName","33_MediBillProvMI","33_MediBillProvNPIId",\
+"33_MediBillProvOrgName","33_MediBillProvOtherId","33_MediBillProvOtherIdFull","33_MediBillProvPhone","33_MediBillProvPostCode",\
+"33_MediBillProvPostCode5","33_MediBillProvPostCodeExt","33_MediBillProvPrefix","33_MediBillProvState","33_MediBillProvSuffix",\
+"33_BillProvNPIId","33_BillProvOrgName","33_BillProvOtherIdFull","33_BillProvPhone","33_BillProvPostCode","33_BillProvState"],
+"33. PHYSICIAN’S, SUPPLIER’S FullID": "33_BillProvOtherIdFull", 
+"33. PHYSICIAN’S, SUPPLIER’S NPI": "33_BillProvNPIId",
+"4. INSURED’S NAME (Last Name, First Name, Middle Initial)":"4_PriInsFullName",
+"5. PATIENT’S ADDRESS (No., Street)":  "5_PatAddr1", 
+"5. Pat_CITY": "5_PatCity", 
+"5. Pat_STATE": "5_PatState", 
+"5. Pat_ZIP CODE": "5_PatPostCode", 
+"5_Telephone": "5_PatPhoneNumber", 
+"6. PATIENT RELATIONSHIP TO INSURED": ["6_PatRelShipChild", "6_PatRelShipOther", "6_PatRelShipSelf", "6_PatRelShipSpouse"],
+"7. INSURED’S ADDRESS (No., Street)": "7_PriInsAddr1", 
+"7. Insurer_CITY":  "7_PriInsCity", 
+"7. Insurer_STATE":"7_PriInsState", 
+"7. Insurer_ZIP CODE": "7_PriInsPostCode", 
+"7_Telephone": "7_PriInsPhoneNumber",
+"8_Reserved_NUCC" :  ["8_PatEmpStatusCode", "8_PatStatus", "8_PatStatusMarried", "8_PatStatusOther", "8_PatStatusSingle", \
+                      "8_PatStudent", "8_PatStudentStatusCodeFT", "8_PatStudentStatusCodePT"],
+"9. a. OTHER INSURED’S POLICY OR GROUP NUMBER": "9A_SecInsPolGrpNumber",
+"9. d. INSURANCE PLAN NAME OR PROGRAM NAME": "9D_SecInsPlanName",
+"9B_Reserved_NUCC": ["9B_SecInsDOB", "9B_SecInsSexF", "9B_SecInsSexM"],
+"9C_Reserved_NUCC" : ["9B_SecInsDOB", "9B_SecInsSexF", "9B_SecInsSexM"],
+"9_Other_InsName": ["9_SecInsFName", "9_SecInsFullName", "9_SecInsLName", "9_SecInsMI", "9_SecInsPrefix", "9_SecInsSuffix"]
 }
-key_mapping = pd.read_excel(ADA_FORM_KEY_MAPPING)
+
+average_coordinates_hcfa_df = pd.read_excel(HCFA_AVERAGE_COORDINATE_PATH)
+key_mapping = pd.read_excel(HCFA_FORM_KEY_MAPPING)
 mapping_dict = key_mapping.set_index('Key_Name').to_dict()['Modified_key']
 reverse_mapping_dict = {v: k for k, v in mapping_dict.items()}
 
 
-class DentalRoiPredictor:
+class HCFARoiPredictor:
     def __init__(self, model_path, category_mapping_path=CATEGORY_MAPPING_PATH):
         self.category_mapping = self._load_category_mapping(category_mapping_path)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -126,14 +149,34 @@ class DentalRoiPredictor:
         final_prediction['labels'] = final_prediction['labels'][keep]
         return final_prediction
 
-    def _postprocessing_annotation(self, df):
-        x0_missing_teeth = df.loc[df['class_name'] == '33_Missing_Teeth', 'x0'].mean()
-        x1_other_fee = df.loc[df['class_name'] == '31_A_Other_Fee', 'x1'].mean()
-        df.loc[df['class_name'] == '24_31_Table', 'x0'] = x0_missing_teeth
-        df.loc[df['class_name'] == '24_31_Table', 'x1'] = x1_other_fee
-        df.loc[df['class_name'] == '35_Remarks', 'x0'] = x0_missing_teeth
-        df.loc[df['class_name'] == '35_Remarks', 'x1'] = x1_other_fee
-        return df
+    def _postprocessing_annotation(self, infer_df):
+        # APPLYING Post prrocessing
+        # Calculate mean values for specific labels
+        xmin_24_table = infer_df.loc[infer_df['class_name'] == '9. d. INSURANCE PLAN NAME OR PROGRAM NAME', 'x0'].mean()
+        xmax_patient_birth_date = infer_df.loc[infer_df['class_name'] == '3. PATIENT’S BIRTH DATE', 'x1'].mean()
+        xmax_21_diagnosis_or_nature_of_illness = infer_df.loc[infer_df['class_name'] == '21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY.', 'x1'].mean()
+        # 1a. INSURED’S I.D. NUMBER
+        xmax_1a_insured_id_number = infer_df.loc[infer_df['class_name'] == '1a. INSURED’S I.D. NUMBER', 'x1'].mean()
+
+
+        # Apply post-processing for '1_InsType' class
+        infer_df.loc[(infer_df['class_name'] == '1_InsType'), 'x0'] = xmin_24_table
+        infer_df.loc[(infer_df['class_name'] == '1_InsType'), 'x1'] = xmax_patient_birth_date
+
+        # Apply post-processing for '35_Remarks' class
+        infer_df.loc[(infer_df['class_name'] == '12_Patient_Auth_Sign'), 'x0'] = xmin_24_table
+        infer_df.loc[(infer_df['class_name'] == '12_Patient_Auth_Sign'), 'x1'] = xmax_patient_birth_date
+
+        infer_df.loc[(infer_df['class_name'] == '21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY.'), 'x0'] = xmin_24_table
+        infer_df.loc[(infer_df['class_name'] == '21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY.'), 'x1'] = xmax_patient_birth_date
+
+        infer_df.loc[(infer_df['class_name'] == '19. Additional Claim Information'), 'x0'] = xmin_24_table
+        infer_df.loc[(infer_df['class_name'] == '19. Additional Claim Information'), 'x1'] = xmax_patient_birth_date
+
+        # 24. Table
+        infer_df.loc[(infer_df['class_name'] == '24. Table'), 'x0'] = xmin_24_table
+        infer_df.loc[(infer_df['class_name'] == '24. Table'), 'x1'] = xmax_1a_insured_id_number
+        return infer_df
 
     def predict_image(self, image):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -147,10 +190,8 @@ class DentalRoiPredictor:
         return predictions
 
     def predict_and_get_dataframe(self, image_path, image,  iou_thresh=0.5):
-        ada_logger.info("Running ROI prediction")
         predictions = self.predict_image(image)
         pred = predictions[0]
-        ada_logger.info("Applying NMS to the prediction")
         pred_nms = self._apply_nms(pred, iou_thresh=iou_thresh)
 
         pred_dict = {
@@ -165,8 +206,10 @@ class DentalRoiPredictor:
 
         class_names = [self.category_mapping[label_id] for label_id in labels_flat]
         num_predictions = len(boxes_flat)
-        #file_name = [image_path] * num_predictions
         file_name = [image_path.split(".")[0]] * num_predictions
+        # file_name = [image_path] * num_predictions
+
+
         infer_df = pd.DataFrame({
             'file_name': file_name,
             'x0': boxes_flat[:, 0],
@@ -177,31 +220,25 @@ class DentalRoiPredictor:
             'class_name': class_names,
             'score': scores_flat
         })
-        ada_logger.info("Post-processing the output ")
 
         post_processed_df = self._postprocessing_annotation(infer_df)
         return post_processed_df
 
-# Load the ROI model
-ada_logger.info(f"Loading ROI model from {MODEL_PATH}")
-frcnn_predictor = DentalRoiPredictor(MODEL_PATH)
+# Load the RPI model
+frcnn_predictor = HCFARoiPredictor(MODEL_PATH)
 
 
 def roi_model_inference(image_path, image):
-    ada_logger.info("Started ROI Model Inference >>")
     result_df = frcnn_predictor.predict_and_get_dataframe(image_path, image)
     max_score_indices = result_df.groupby('class_name')['score'].idxmax()
     result_df = result_df.loc[max_score_indices]
-    ada_logger.info(">> Completed ROI Model Inference")
     return result_df
 
 def run_prediction_donut(image, model, processor):
-    ada_logger.info("Starting to run prediction on Donut >>>")
     pixel_values = processor(image, return_tensors="pt").pixel_values
     task_prompt = "<s>"
-    ada_logger.info("Running Donut tokenization")
     decoder_input_ids = processor.tokenizer(task_prompt, add_special_tokens=False, return_tensors="pt").input_ids
-    ada_logger.info("Running Donut generate function")
+
     outputs = model.generate(
         pixel_values.to(device),
         decoder_input_ids=decoder_input_ids.to(device),
@@ -218,7 +255,6 @@ def run_prediction_donut(image, model, processor):
     prediction = processor.batch_decode(outputs.sequences)[0]
     prediction = prediction.replace("<one>", "1")
     prediction = processor.token2json(prediction)
-    ada_logger.info(">> Completed prediction on Donut")
     return prediction, outputs
 
 def split_and_expand(row):
@@ -233,21 +269,20 @@ def split_and_expand(row):
 
 def load_model(device):
     try:
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/ADA_98")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/ADA_98", cache_dir= "/Data/FSl_ML")
+        processor = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_99", cache_dir= "/Data/FSl_ML")
+        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_99", cache_dir= "/Data/FSl_ML")
         model.eval().to(device)
-        ada_logger.info("Model loaded successfully")
+        print("Model loaded successfully")
     except:
-        ada_logger.info("Model Loading failed !!!")
+        print("Model Loading failed !!!")
     return processor, model
 
 
-def convert_predictions_to_df(prediction):
+def convert_hcfa_predictions_to_df(prediction):
     expanded_df = pd.DataFrame()
     result_df_each_image = pd.DataFrame()    
     each_image_output = pd.DataFrame(list(prediction.items()), columns=["Key", "Value"])
-    try:
-        ada_logger.info("Converting Donut prediction to dataframe")
+    try:    
         expanded_df = pd.DataFrame(columns=['Key', 'Value'])
         for index, row in each_image_output[each_image_output['Value'].str.contains(';')].iterrows():
             expanded_df = pd.concat([expanded_df, pd.DataFrame(split_and_expand(row))], ignore_index=True)
@@ -258,7 +293,6 @@ def convert_predictions_to_df(prediction):
         for old_key, new_key in reverse_mapping_dict.items():
             result_df_each_image["Key"].replace(old_key, new_key, inplace=True)
     except Exception as e:
-        ada_logger.info(f"Error while converting donut prediction to dataframe {e}")
         pass
         
     return result_df_each_image
@@ -350,29 +384,27 @@ processor, model = load_model(device)
 
 
 
-def run_ada_pipeline(image_path: str):
+def run_hcfa_pipeline(image_path: str):
     try:
         # image_path = os.path.join(input_image_folder, each_image)
         pil_image = Image.open(image_path).convert('RGB')
-        #pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
+        # pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
         to_tensor = transforms.ToTensor()
         image = to_tensor(pil_image)
         prediction, output = run_prediction_donut(pil_image, model, processor)
-        donut_out = convert_predictions_to_df(prediction)
-
-        # print(donut_out)
+        donut_out = convert_hcfa_predictions_to_df(prediction)
 
         # What is this? Is it Mapping the donut keys to XML values? Can't understand.
-        for old_key, new_key in reverse_mapping_dict.items():
-            donut_out["Key"].replace(old_key, new_key, inplace=True)
-        
+        # for old_key, new_key in reverse_mapping_dict.items():
+        #     donut_out["Key"].replace(old_key, new_key, inplace=True)
+
         # This is just converting the dataframe to dictionary
         json_data = donut_out.to_json(orient='records')
         data_list = json.loads(json_data)
+        # output_dict_donut = {item['Key']: item['Value'] for item in data_list}
+
         output_dict_donut = {}
 
-
-        ada_logger.info("Converting donut output to a structured format")
         # Iterate through the data_list
         for item in data_list:
             key = item['Key']
@@ -384,35 +416,54 @@ def run_ada_pipeline(image_path: str):
                 output_dict_donut[key].append({'value': value})
             else:
                 # If the key doesn't exist, create a new list with the current value
-                output_dict_donut[key] = [{'value': value}]        
-
+                output_dict_donut[key] = [{'value': value}]
+        output_dict_donut['24_NDCCharges'] = [{'value': '[BLANK]'}]
+        output_dict_donut['24_NDCQualifier'] = [{'value': '[BLANK]'}]
         # This is just doing the ROI inference and converting DF to dict
         res = roi_model_inference(image_path, image)
         df_dict = res.to_dict(orient='records')
 
-        ada_logger.info("Structuring ROI output")
-        # Now we just want that the classname should be the key and the values are the coordinates so 
-        # output_dict_det has the class_name : x0 x1 y0 y1
+        # Implementing the average part here
+
+        # Convert the average coordinates DataFrame to a dictionary for easy access
+        average_coordinates_dict = average_coordinates_hcfa_df.set_index('label').to_dict(orient='index')
+
+        # Get all unique class names
+        all_class_names = set(average_coordinates_hcfa_df['label'])
+
+        # Initialize the output dictionary
         output_dict_det = {}
-        for item in df_dict:
-            class_name = item['class_name']
-            x1, y1, x2, y2 = item['x0'], item['y0'], item['x1'], item['y1']
+
+        # Iterate over all class names
+        for class_name in all_class_names:
+            # Check if the class name exists in df_dict
+            item = next((item for item in df_dict if item['class_name'] == class_name), None)
+            if item:
+                # If the class name exists, use the coordinates from df_dict
+                x1, y1, x2, y2 = item['x0'], item['y0'], item['x1'], item['y1']
+            else:
+                # If the class name doesn't exist, replace coordinates with average coordinates
+                avg_coords = average_coordinates_dict.get(class_name, None)
+                if avg_coords:
+                    x1 = avg_coords['xmin']
+                    y1 = avg_coords['ymin']
+                    x2 = avg_coords['xmax']
+                    y2 = avg_coords['ymax']
+                else:
+                    # If average coordinates are not available, set coordinates to NaN
+                    x1, y1, x2, y2 = float('nan'), float('nan'), float('nan'), float('nan')
+
+            # Store the coordinates in the output dictionary
             output_dict_det[class_name] = {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2}
 
-        ada_logger.info("Mapping output with the required keys")
         # Map the ROI keys with the Donut keys
-        result_dict_1 = map_result1(output_dict_det, BBOX_DONUT_Mapping_Dict)
+        result_dict_1 = map_result1(output_dict_det, BBOX_HCFA_DONUT_Mapping_Dict)
         # result_dict_2 = map_result2(output_dict_det, BBOX_DONUT_Mapping_Dict)
         final_mapping_dict  = map_result1_final_output(result_dict_1, output_dict_donut)
 
         return {"result": final_mapping_dict}, None
     except Exception as e:
-        ada_logger.exception(f"Error while running run_ada_pipeline {e}")
         return None, str(e)
-
-# with open('notes.json') as f:
-#     category_mapping = {c['id'] + 1: c['name'] for c in json.load(f)['categories']}
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Your application description")

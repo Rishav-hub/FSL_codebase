@@ -1,0 +1,45 @@
+2024-04-30 08:53:07 INFO     Loading ROI model from /Data/FSl_ML/FSL_codebase/api/ADA/artifacts/ada__88.pth
+2024-04-30 08:53:17 INFO     Model loaded successfully
+2024-04-30 08:54:14 INFO     Got request to API {'FilePath': '/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff'}
+2024-04-30 08:54:14 INFO     Image file path in the server /Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff
+2024-04-30 08:54:14 INFO     Starting to run prediction on Donut >>>
+2024-04-30 08:54:14 INFO     Running Donut tokenization
+2024-04-30 08:54:14 INFO     Running Donut generate function
+2024-04-30 08:54:18 INFO     >> Completed prediction on Donut
+2024-04-30 08:54:18 INFO     Converting Donut prediction to dataframe
+2024-04-30 08:54:18 INFO     Converting donut output to a structured format
+2024-04-30 08:54:18 INFO     Started ROI Model Inference >>
+2024-04-30 08:54:18 INFO     Running ROI prediction
+2024-04-30 08:54:18 INFO     Applying NMS to the prediction
+2024-04-30 08:54:18 INFO     Post-processing the output 
+2024-04-30 08:54:18 INFO     >> Completed ROI Model Inference
+2024-04-30 08:55:22 INFO     Got request to API {'FilePath': '/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff'}
+2024-04-30 08:55:22 INFO     Image file path in the server /Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff
+2024-04-30 08:55:22 INFO     Starting to run prediction on Donut >>>
+2024-04-30 08:55:22 INFO     Running Donut tokenization
+2024-04-30 08:55:22 INFO     Running Donut generate function
+2024-04-30 08:55:25 INFO     >> Completed prediction on Donut
+2024-04-30 08:55:25 INFO     Converting Donut prediction to dataframe
+2024-04-30 08:55:25 INFO     Converting donut output to a structured format
+2024-04-30 08:55:25 INFO     Started ROI Model Inference >>
+2024-04-30 08:55:25 INFO     Running ROI prediction
+2024-04-30 08:55:25 INFO     Applying NMS to the prediction
+2024-04-30 08:55:25 INFO     Post-processing the output 
+2024-04-30 08:55:25 INFO     >> Completed ROI Model Inference
+2024-04-30 09:01:58 INFO     Loading ROI model from /Data/FSl_ML/FSL_codebase/api/ADA/artifacts/ada__88.pth
+2024-04-30 09:02:06 INFO     Model loaded successfully
+2024-04-30 09:03:54 INFO     Got request to API {'FilePath': '/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff'}
+2024-04-30 09:03:54 INFO     Image file path in the server /Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff
+2024-04-30 09:03:54 INFO     Starting to run prediction on Donut >>>
+2024-04-30 09:03:54 INFO     Running Donut tokenization
+2024-04-30 09:03:54 INFO     Running Donut generate function
+2024-04-30 09:03:58 INFO     >> Completed prediction on Donut
+2024-04-30 09:03:58 INFO     Converting Donut prediction to dataframe
+2024-04-30 09:03:58 INFO     Converting donut output to a structured format
+2024-04-30 09:03:58 INFO     Started ROI Model Inference >>
+2024-04-30 09:03:58 INFO     Running ROI prediction
+2024-04-30 09:03:58 INFO     Applying NMS to the prediction
+2024-04-30 09:03:58 INFO     Post-processing the output 
+2024-04-30 09:03:58 INFO     >> Completed ROI Model Inference
+2024-04-30 09:03:58 INFO     Structuring ROI output
+2024-04-30 09:03:58 INFO     Mapping output with the required keys

@@ -1,0 +1,15 @@
+2024-06-07 13:57:48 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-07 13:57:48 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-07 13:57:48 INFO     Starting to run prediction on Donut >>>
+2024-06-07 13:57:48 INFO     Running Donut tokenization
+2024-06-07 13:57:48 INFO     Running Donut generate function
+2024-06-07 13:57:52 INFO     >> Completed prediction on Donut
+2024-06-07 13:57:52 INFO     Converting Donut prediction to dataframe
+2024-06-07 13:57:52 INFO     Converting donut output to a structured format
+2024-06-07 13:57:52 INFO     Started ROI Model Inference >>
+2024-06-07 13:57:52 INFO     Running ROI prediction
+2024-06-07 13:57:53 INFO     Applying NMS to the prediction
+2024-06-07 13:57:53 INFO     Post-processing the output 
+2024-06-07 13:57:53 INFO     >> Completed ROI Model Inference
+2024-06-07 13:57:53 INFO     Structuring ROI output
+2024-06-07 13:57:53 INFO     Mapping output with the required keys

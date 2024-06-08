@@ -8,8 +8,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 import torch
 import json, os
 
-from extraction_util import run_hcfa_pipeline
-
+from extraction_util import run_ub_pipeline
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -19,31 +18,34 @@ app = FastAPI()
 async def root_route():
     return "Application working"
 
-@app.post("/hcfa_extraction")
+@app.post("/ub_extraction")
 async def ml_extraction(data: dict):
     try:
-        print("Received data --->>", data)
+
         # Get the image path from the payload
         # image_file_path = data["ClipData"][0]['FilePath']
 
         # image_file_path = data.get('FilePath')
 
+       # ada_logger.info(f"Got request to API {data}")
+
         image_file_path = data.get('FilePath')
-        print("Got Image file Path", image_file_path)
+
+        #ada_logger.info(f"Image file path in the server {image_file_path}")
+
         if not image_file_path:
-            print("Image file Path NOT found", image_file_path)
             raise HTTPException(status_code=400, detail="FilePath field is required")
 
         if not os.path.exists(image_file_path):
-            print("File is not found --->>")
             raise HTTPException(status_code=400, detail=f"File not found: {image_file_path}")
 
-        print("Starting the extraction >>>>")
-        result, error = run_hcfa_pipeline(image_file_path)
-        print("error here --->>", error)
+        result, error = run_ub_pipeline(image_file_path)
+        print(error)
+
         if error:
             # If there's an error, raise HTTPException with status code 500 (Internal Server Error)
             raise HTTPException(status_code=500, detail=error)
+        
 
         # If there's no error, return the result with file path
         response_data = {"file_path": data.get('FilePath'), "result": result['result']}
@@ -51,13 +53,13 @@ async def ml_extraction(data: dict):
 
     except Exception as e:
         print(e)
+
         print(f"Error occured while processing {e} >>> ")
         return JSONResponse(
             status_code=500,
             content=f"Error while processing Extraction {e}"
         )
 
-
 if __name__ == '__main__':
-    uvicorn.run("app:app", host="0.0.0.0", port=8081)
+    uvicorn.run("app:app", host="0.0.0.0", port=5002)
 

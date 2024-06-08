@@ -23,10 +23,15 @@ import warnings
 warnings.filterwarnings('ignore')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\notes.json'
-MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa__94.pth'
-HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
-HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
+
+MODEL_PATH = '/Data/FSl_ML/FSL_codebase/api/HCFA/artifacts/hcfa__94.pth'
+
+HCFA_FORM_KEY_MAPPING = "/Data/FSl_ML/FSL_codebase/api/HCFA/artifacts/HCFA_Keys_All.xlsx"
+
+HCFA_AVERAGE_COORDINATE_PATH = "/Data/FSl_ML/FSL_codebase/api/HCFA/artifacts/average_coordinates_hcfa.xlsx"
+
+CATEGORY_MAPPING_PATH = '/Data/FSl_ML/FSL_codebase/api/HCFA/artifacts/notes.json'
+
 BBOX_HCFA_DONUT_Mapping_Dict = {
 "10. IS PATIENT’S CONDITION RELATED TO:": ["10A_PatConditionEmpN", "10A_PatConditionEmpY", "10B_PatConditionAutoN",\
                                            "10B_PatConditionAutoY","10C_PatConditionOtherN","10C_PatConditionOtherY"],
@@ -56,7 +61,7 @@ BBOX_HCFA_DONUT_Mapping_Dict = {
 "21. DIAGNOSIS OR NATURE OF ILLNESS OR INJURY.": ["21_DiagDescription","21_DiagCode", "21_ICDInd"],
 "22. MEDICAID RESUBMISSION CODE and Original Ref No": ["22_MedicaidCode", "22_MedicaidRefNum"],
 "23. PRIOR AUTHORIZATION NUMBER": "23_PriorAuthNum",
-"24. Table": ["24_HCT", "24_MedicaidPaidAmount", "24_NDC", "24_NDCUnits", "24_NDCUnitsQual", "24_ProcDesc", \
+"24. Table": ["24_HCT", "24_MedicaidPaidAmount", "24_NDC", "24_NDCUnits", "24_NDCUnitsQual", "24_ProcDesc", "24_NDCCharges","24_NDCQualifier",\
               "24_ClmTaxAmount", "24A_FromDate", "24A_ToDate", "24B_POS", "24C_EMG", "24D_Modifier", "24D_ProcCode",\
                 "24E_DiagPtr", "24F_LineCharges", "24G_Units", "24H_EPSDT", "24H_EPSDT1", "24J_RenProvNPIId", \
                 "24J_RenProvOtherId", "24_ClmNYSurChargeAmount", "24_ClmDiscountAmount"],
@@ -263,8 +268,8 @@ def split_and_expand(row):
 
 def load_model(device):
     try:
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_99")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_99")
+        processor = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_99", cache_dir="/Data/FSl_ML/")
+        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_99", cache_dir="/Data/FSl_ML/")
         model.eval().to(device)
         print("Model loaded successfully")
     except:
@@ -412,7 +417,8 @@ def run_hcfa_pipeline(image_path: str):
             else:
                 # If the key doesn't exist, create a new list with the current value
                 output_dict_donut[key] = [{'value': value}]
-
+	output_dict_donut['24_NDCCharges'] = [{'value': '[BLANK]'}]
+	output_dict_donut['24_NDCQualifier'] = [{'value': '[BLANK]'}]
         # This is just doing the ROI inference and converting DF to dict
         res = roi_model_inference(image_path, image)
         df_dict = res.to_dict(orient='records')

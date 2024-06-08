@@ -2,12 +2,19 @@ import requests
 import time
 
 # Define the URL of the API endpoint
-url = "http://localhost:5001/hcfa_extraction"
+url = "http://localhost:8081/hcfa_extraction"
 
 # Define the payload data as a dictionary
+#data = {
+#    "FilePath": "/Data/FSl_ML/Test_Data/New_BSC_test_HCFA/TIFF/PHPCB44XO008_001.tiff"
+#}
+
 data = {
-    "FilePath": r"D:\project\FSL\FSL_codebase\api\HCFA\images\117914B4AZ009_001_0.jpg"
+
+   "FilePath" :"/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A0D001_001.tiff"
+
 }
+
 
 try:
     # Measure the start time

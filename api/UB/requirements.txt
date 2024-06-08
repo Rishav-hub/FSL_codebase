@@ -3,7 +3,7 @@ torch
 torchvision 
 pandas
 transformers
---index-url https://download.pytorch.org/whl/cu121
+# --index-url https://download.pytorch.org/whl/cu121
 
 
 # API

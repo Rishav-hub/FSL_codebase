@@ -1,0 +1,120 @@
+2024-06-04 03:15:19 INFO     Got request to API {'FilePath': '/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff'}
+2024-06-04 03:15:19 INFO     Image file path in the server /Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff
+2024-06-04 03:15:20 INFO     Starting to run prediction on Donut >>>
+2024-06-04 03:15:20 INFO     Running Donut tokenization
+2024-06-04 03:15:20 INFO     Running Donut generate function
+2024-06-04 03:15:26 INFO     >> Completed prediction on Donut
+2024-06-04 03:15:26 INFO     Converting Donut prediction to dataframe
+2024-06-04 03:15:26 INFO     Converting donut output to a structured format
+2024-06-04 03:15:26 INFO     Started ROI Model Inference >>
+2024-06-04 03:15:26 INFO     Running ROI prediction
+2024-06-04 03:15:27 INFO     Applying NMS to the prediction
+2024-06-04 03:15:27 INFO     Post-processing the output 
+2024-06-04 03:15:27 INFO     >> Completed ROI Model Inference
+2024-06-04 03:15:27 INFO     Structuring ROI output
+2024-06-04 03:15:27 INFO     Mapping output with the required keys
+2024-06-04 05:44:51 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 05:44:51 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 05:44:51 INFO     Starting to run prediction on Donut >>>
+2024-06-04 05:44:51 INFO     Running Donut tokenization
+2024-06-04 05:44:51 INFO     Running Donut generate function
+2024-06-04 05:44:55 INFO     >> Completed prediction on Donut
+2024-06-04 05:44:55 INFO     Converting Donut prediction to dataframe
+2024-06-04 05:44:55 INFO     Converting donut output to a structured format
+2024-06-04 05:44:55 INFO     Started ROI Model Inference >>
+2024-06-04 05:44:55 INFO     Running ROI prediction
+2024-06-04 05:44:55 INFO     Applying NMS to the prediction
+2024-06-04 05:44:55 INFO     Post-processing the output 
+2024-06-04 05:44:55 INFO     >> Completed ROI Model Inference
+2024-06-04 05:44:55 INFO     Structuring ROI output
+2024-06-04 05:44:55 INFO     Mapping output with the required keys
+2024-06-04 06:08:10 INFO     Got request to API {'FilePath': '/Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff'}
+2024-06-04 06:08:10 INFO     Image file path in the server /Data/FSl_ML/Test_Data/New_ADA_test/TIFF/2025I4A9D015_001.tiff
+2024-06-04 06:08:10 INFO     Starting to run prediction on Donut >>>
+2024-06-04 06:08:10 INFO     Running Donut tokenization
+2024-06-04 06:08:10 INFO     Running Donut generate function
+2024-06-04 06:08:13 INFO     >> Completed prediction on Donut
+2024-06-04 06:08:13 INFO     Converting Donut prediction to dataframe
+2024-06-04 06:08:13 INFO     Converting donut output to a structured format
+2024-06-04 06:08:13 INFO     Started ROI Model Inference >>
+2024-06-04 06:08:13 INFO     Running ROI prediction
+2024-06-04 06:08:13 INFO     Applying NMS to the prediction
+2024-06-04 06:08:13 INFO     Post-processing the output 
+2024-06-04 06:08:13 INFO     >> Completed ROI Model Inference
+2024-06-04 06:08:13 INFO     Structuring ROI output
+2024-06-04 06:08:13 INFO     Mapping output with the required keys
+2024-06-04 06:51:36 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 06:51:36 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 06:51:36 INFO     Starting to run prediction on Donut >>>
+2024-06-04 06:51:36 INFO     Running Donut tokenization
+2024-06-04 06:51:36 INFO     Running Donut generate function
+2024-06-04 06:51:40 INFO     >> Completed prediction on Donut
+2024-06-04 06:51:40 INFO     Converting Donut prediction to dataframe
+2024-06-04 06:51:40 INFO     Converting donut output to a structured format
+2024-06-04 06:51:40 INFO     Started ROI Model Inference >>
+2024-06-04 06:51:40 INFO     Running ROI prediction
+2024-06-04 06:51:40 INFO     Applying NMS to the prediction
+2024-06-04 06:51:40 INFO     Post-processing the output 
+2024-06-04 06:51:40 INFO     >> Completed ROI Model Inference
+2024-06-04 06:51:40 INFO     Structuring ROI output
+2024-06-04 06:51:40 INFO     Mapping output with the required keys
+2024-06-04 06:52:04 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 06:52:04 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 06:52:04 INFO     Starting to run prediction on Donut >>>
+2024-06-04 06:52:04 INFO     Running Donut tokenization
+2024-06-04 06:52:04 INFO     Running Donut generate function
+2024-06-04 06:52:08 INFO     >> Completed prediction on Donut
+2024-06-04 06:52:08 INFO     Converting Donut prediction to dataframe
+2024-06-04 06:52:08 INFO     Converting donut output to a structured format
+2024-06-04 06:52:08 INFO     Started ROI Model Inference >>
+2024-06-04 06:52:08 INFO     Running ROI prediction
+2024-06-04 06:52:08 INFO     Applying NMS to the prediction
+2024-06-04 06:52:08 INFO     Post-processing the output 
+2024-06-04 06:52:08 INFO     >> Completed ROI Model Inference
+2024-06-04 06:52:08 INFO     Structuring ROI output
+2024-06-04 06:52:08 INFO     Mapping output with the required keys
+2024-06-04 06:52:37 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 06:52:37 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 06:52:37 INFO     Starting to run prediction on Donut >>>
+2024-06-04 06:52:37 INFO     Running Donut tokenization
+2024-06-04 06:52:37 INFO     Running Donut generate function
+2024-06-04 06:52:41 INFO     >> Completed prediction on Donut
+2024-06-04 06:52:41 INFO     Converting Donut prediction to dataframe
+2024-06-04 06:52:41 INFO     Converting donut output to a structured format
+2024-06-04 06:52:41 INFO     Started ROI Model Inference >>
+2024-06-04 06:52:41 INFO     Running ROI prediction
+2024-06-04 06:52:41 INFO     Applying NMS to the prediction
+2024-06-04 06:52:41 INFO     Post-processing the output 
+2024-06-04 06:52:41 INFO     >> Completed ROI Model Inference
+2024-06-04 06:52:41 INFO     Structuring ROI output
+2024-06-04 06:52:41 INFO     Mapping output with the required keys
+2024-06-04 06:54:29 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 06:54:29 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 06:54:29 INFO     Starting to run prediction on Donut >>>
+2024-06-04 06:54:29 INFO     Running Donut tokenization
+2024-06-04 06:54:29 INFO     Running Donut generate function
+2024-06-04 06:54:34 INFO     >> Completed prediction on Donut
+2024-06-04 06:54:34 INFO     Converting Donut prediction to dataframe
+2024-06-04 06:54:34 INFO     Converting donut output to a structured format
+2024-06-04 06:54:34 INFO     Started ROI Model Inference >>
+2024-06-04 06:54:34 INFO     Running ROI prediction
+2024-06-04 06:54:34 INFO     Applying NMS to the prediction
+2024-06-04 06:54:34 INFO     Post-processing the output 
+2024-06-04 06:54:34 INFO     >> Completed ROI Model Inference
+2024-06-04 06:54:34 INFO     Structuring ROI output
+2024-06-04 06:54:34 INFO     Mapping output with the required keys
+2024-06-04 18:08:10 INFO     Got request to API {'FilePath': '/mnt/win_share2/Xelp/BRB1Q45IDE001.tiff'}
+2024-06-04 18:08:10 INFO     Image file path in the server /mnt/win_share2/Xelp/BRB1Q45IDE001.tiff
+2024-06-04 18:08:11 INFO     Starting to run prediction on Donut >>>
+2024-06-04 18:08:11 INFO     Running Donut tokenization
+2024-06-04 18:08:11 INFO     Running Donut generate function
+2024-06-04 18:08:15 INFO     >> Completed prediction on Donut
+2024-06-04 18:08:15 INFO     Converting Donut prediction to dataframe
+2024-06-04 18:08:15 INFO     Converting donut output to a structured format
+2024-06-04 18:08:15 INFO     Started ROI Model Inference >>
+2024-06-04 18:08:15 INFO     Running ROI prediction
+2024-06-04 18:08:15 INFO     Applying NMS to the prediction
+2024-06-04 18:08:15 INFO     Post-processing the output 
+2024-06-04 18:08:15 INFO     >> Completed ROI Model Inference
+2024-06-04 18:08:15 INFO     Structuring ROI output
+2024-06-04 18:08:15 INFO     Mapping output with the required keys
