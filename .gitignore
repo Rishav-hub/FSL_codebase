@@ -160,8 +160,8 @@ cython_debug/
 #.idea/
 *.zip
 docs/
-api/ADA/artifacts/
-api/HCFA/artifacts
-api/HCFA_RD/artifacts/
-api/UB/artifact/
-api/UB/artifact/ub__100.pth
+/Data/FSl_ML/FSL_codebase/api/ADA/artifacts/
+/Data/FSl_ML/FSL_codebase/api/HCFA/artifacts/
+/Data/FSl_ML/FSL_codebase/api/HCFA_RD/artifacts/
+/Data/FSl_ML/FSL_codebase/api/UB/artifact/
+/Data/FSl_ML/FSL_codebase/api/UB/artifact/ub__100.pth
