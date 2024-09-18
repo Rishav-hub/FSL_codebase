@@ -2,11 +2,11 @@ import requests
 import time
 
 # Define the URL of the API endpoint
-url = "http://localhost:5001/hcfa_extraction"
+url = "http://localhost:5003/hcfa_extraction"
 
 # Define the payload data as a dictionary
 data = {
-    "FilePath": r"D:\project\FSL\FSL_codebase\api\HCFA\images\1149142YAZ006_001.png"
+    "FilePath": r"D:\project\FSL\FSL_codebase\api\HCFA\images\1149142YAZ006_001.PNG"
 }
 
 try:
