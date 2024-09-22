@@ -27,6 +27,10 @@ CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\notes.j
 MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa__94.pth'
 HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
 HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
+KEYS_FROM_OLD = ["29_AmountPaid", "33_BillProvPhone", "11D_PriInsOtherPlanN", "22_MedicaidCode", \
+                     "11D_PriInsOtherPlanY", "22_MedicaidRefNum", "24C_EMG", "19_LocalUse", "30_BalanceDue"]
+
+
 BBOX_HCFA_DONUT_Mapping_Dict = {
 "10. IS PATIENT’S CONDITION RELATED TO:": ["10A_PatConditionEmpN", "10A_PatConditionEmpY", "10B_PatConditionAutoN",\
                                            "10B_PatConditionAutoY","10C_PatConditionOtherN","10C_PatConditionOtherY",
@@ -272,16 +276,20 @@ def split_and_expand(row):
 def load_model(device):
     try:
         # Laskari-Naveen/HCFA_102 Laskari-Naveen/HCFA_99
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_102")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_102")
-        model.eval().to(device)
+        processor_1 = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_99")
+        model_1 = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_99")
+        model_1.eval().to(device)
+
+        processor_2 = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_102")
+        model_2 = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_102")
+        model_2.eval().to(device)
         print("Model loaded successfully")
     except:
         print("Model Loading failed !!!")
-    return processor, model
+    return processor_1, model_1, processor_2, model_2 
 
 
-def convert_hcfa_predictions_to_df(prediction):
+def convert_hcfa_predictions_to_df(prediction, version = 'new'):
     expanded_df = pd.DataFrame()
     result_df_each_image = pd.DataFrame()    
     each_image_output = pd.DataFrame(list(prediction.items()), columns=["Key", "Value"])
@@ -293,9 +301,12 @@ def convert_hcfa_predictions_to_df(prediction):
         result_df_each_image = pd.concat([each_image_output, expanded_df], ignore_index=True)
         result_df_each_image = result_df_each_image.drop(result_df_each_image[result_df_each_image['Value'].str.contains(';')].index)
 
-        # for old_key, new_key in reverse_mapping_dict.items():
-        #     result_df_each_image["Key"].replace(old_key, new_key, inplace=True)
+        if version == 'old':
+            for old_key, new_key in reverse_mapping_dict.items():
+                result_df_each_image["Key"].replace(old_key, new_key, inplace=True)
+
     except Exception as e:
+        print(f"Error in convert_hcfa_predictions_to_df {e}")
         pass
         
     return result_df_each_image
@@ -383,8 +394,7 @@ def map_result1_final_output(result_dict_1, additional_info_dict):
 
 
 # Load the models
-processor, model = load_model(device)
-
+processor_1, model_1, processor_2, model_2 = load_model(device)
 
 
 def run_hcfa_pipeline(image_path: str):
@@ -394,8 +404,26 @@ def run_hcfa_pipeline(image_path: str):
         # pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
         to_tensor = transforms.ToTensor()
         image = to_tensor(pil_image)
-        prediction, output = run_prediction_donut(pil_image, model, processor)
-        donut_out = convert_hcfa_predictions_to_df(prediction)
+
+        """USE TWO MODEL TO HANDLE THE BLANK KEY 
+            - model_1 (old model)
+            - model_2 (new model)
+            - processor_1 (new processor)
+            - processor_2 (old processor)
+
+            convert_hcfa_predictions_to_df_old and
+            convert_hcfa_predictions_to_df_new
+
+        """
+        prediction_old, output = run_prediction_donut(pil_image, model_1, processor_1)
+        donut_out_old = convert_hcfa_predictions_to_df(prediction_old, version = "old")
+
+        prediction_new, output = run_prediction_donut(pil_image, model_2, processor_2)
+        donut_out_new = convert_hcfa_predictions_to_df(prediction_new, version = "new")
+        
+        ###### MERGE OLD AND NEW MODEL OUTPUT #######
+        from src.utils import merge_donut_outputs
+        donut_out = merge_donut_outputs(donut_out_old, donut_out_new, KEYS_FROM_OLD)
 
         # What is this? Is it Mapping the donut keys to XML values? Can't understand.
         # for old_key, new_key in reverse_mapping_dict.items():
