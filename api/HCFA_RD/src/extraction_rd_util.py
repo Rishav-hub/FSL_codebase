@@ -23,10 +23,16 @@ import warnings
 warnings.filterwarnings('ignore')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa_rd_notes_grouped_v2.json'
-HCFA_RD_MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa_rd_grouped_30.pth'
-HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
-HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
+CATEGORY_MAPPING_PATH = r'/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/hcfa_rd_notes_grouped_v2.json'
+
+HCFA_RD_MODEL_PATH = r'/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/hcfa_rd_grouped_30.pth'
+
+HCFA_FORM_KEY_MAPPING = r"/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/HCFA_Keys_All.xlsx"
+
+HCFA_AVERAGE_COORDINATE_PATH = r"/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/average_coordinates_hcfa.xlsx"
+
+
+
 group_key_mapping_dict = {'1_class': ['1A_PriInsIDNumber'],
  '2_class': ['2_PatFullName'],
  '3_class': ['3_PatDOB', '3_PatSexM', '3_PatSexF'],
@@ -342,11 +348,12 @@ def split_and_expand(row):
 
 def load_model(device):
     try:
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/hcfa_rd_v1")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/hcfa_rd_v1")
+        processor = AutoProcessor.from_pretrained("/Data/Models/HCFA_new_prod_model/HCFA_102/")
+        model = VisionEncoderDecoderModel.from_pretrained("/Data/Models/HCFA_new_prod_model/HCFA_102/")
         model.eval().to(device)
         print("Model loaded successfully")
-    except:
+    except Exception as e:
+        print(e)
         print("Model Loading failed !!!")
     return processor, model
 

@@ -23,10 +23,18 @@ import warnings
 warnings.filterwarnings('ignore')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\notes.json'
-MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa__94.pth'
-HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
-HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
+
+
+
+CATEGORY_MAPPING_PATH = r'/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/notes.json'
+
+MODEL_PATH = r'/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/hcfa__94.pth'
+
+HCFA_FORM_KEY_MAPPING = r"/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/HCFA_Keys_All.xlsx"
+
+HCFA_AVERAGE_COORDINATE_PATH = r"/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/average_coordinates_hcfa.xlsx"
+
+
 BBOX_HCFA_DONUT_Mapping_Dict = {
 "10. IS PATIENT’S CONDITION RELATED TO:": ["10A_PatConditionEmpN", "10A_PatConditionEmpY", "10B_PatConditionAutoN",\
                                            "10B_PatConditionAutoY","10C_PatConditionOtherN","10C_PatConditionOtherY"],
@@ -265,11 +273,12 @@ def split_and_expand(row):
 
 def load_model(device):
     try:
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/HCFA_99")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/HCFA_99")
+        processor = AutoProcessor.from_pretrained("/Data/Models/HCFA_new_prod_model/HCFA_102/")
+        model = VisionEncoderDecoderModel.from_pretrained("/Data/Models/HCFA_new_prod_model/HCFA_102/")
         model.eval().to(device)
         print("Model loaded successfully")
-    except:
+    except Exception as e:
+        print(e)
         print("Model Loading failed !!!")
     return processor, model
 

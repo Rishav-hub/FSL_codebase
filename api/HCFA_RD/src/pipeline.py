@@ -4,12 +4,12 @@ from src.extraction_util import run_hcfa_pipeline
 from fastai.learner import load_learner
 import torch
 import pathlib
-temp = pathlib.PosixPath
-pathlib.PosixPath = pathlib.WindowsPath
+#temp = pathlib.PosixPath
+#pathlib.PosixPath = pathlib.WindowsPath
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
-IMAGE_CLASSIFIER = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Classifier.pkl"
+IMAGE_CLASSIFIER = r"/Data/FSL_prod_codebase/FSL_codebase/api/HCFA_RD/artifacts/HCFA_Classifier.pkl"
 
 
 # Define Image classifier function
