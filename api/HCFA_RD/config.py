@@ -1,6 +1,17 @@
+import os
+ROOT = os.getcwd()
+LOG_DIR = "logs"
+LOG_FILE = "hcfa_logs.txt"
+
+LOGFILE_DIR = os.path.join(ROOT, LOG_DIR, LOG_FILE)
+
+
+IMAGE_CLASSIFIER = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Classifier.pkl"
+
+
 ################# HCFA RD CONFIG ########################3
 
-CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa_rd_notes_grouped_v2.json'
+RD_CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa_rd_notes_grouped_v2.json'
 HCFA_RD_MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa_rd_grouped_30.pth'
 HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
 HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
@@ -246,10 +257,10 @@ mapping_overlaps = {'8_PatStatus': ['8_PatStudent'],
 ################# HCFA NORMAL CONFIG ########################3
 CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\notes.json'
 MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\HCFA\artifacts\hcfa__94.pth'
-HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
-HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
-KEYS_FROM_OLD = ["29_AmountPaid", "33_BillProvPhone", "11D_PriInsOtherPlanN", "22_MedicaidCode", \
-                     "11D_PriInsOtherPlanY", "22_MedicaidRefNum", "24C_EMG", "19_LocalUse", "30_BalanceDue"]
+# HCFA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\HCFA_Keys_All.xlsx"
+# HCFA_AVERAGE_COORDINATE_PATH = r"D:\project\FSL\FSL_codebase\api\HCFA\artifacts\average_coordinates_hcfa.xlsx"
+# KEYS_FROM_OLD = ["29_AmountPaid", "33_BillProvPhone", "11D_PriInsOtherPlanN", "22_MedicaidCode", \
+#                      "11D_PriInsOtherPlanY", "22_MedicaidRefNum", "24C_EMG", "19_LocalUse", "30_BalanceDue"]
 
 
 BBOX_HCFA_DONUT_Mapping_Dict = {

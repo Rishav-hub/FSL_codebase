@@ -1,6 +1,7 @@
 import json
 import torch
 import io
+import time
 import torchvision
 import pandas as pd
 from torchvision.io import read_image
@@ -19,9 +20,12 @@ import argparse
 import warnings
 # from tqdm import tqdm
 
+from src.logger import log_message, setup_logger
 from config import *
 
 warnings.filterwarnings('ignore')
+logger = setup_logger(LOGFILE_DIR)
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -34,7 +38,7 @@ reverse_mapping_dict = {v: k for k, v in mapping_dict.items()}
 import json
 
 class HCFARDRoiPredictor:
-    def __init__(self, model_path, category_mapping_path=CATEGORY_MAPPING_PATH):
+    def __init__(self, model_path, category_mapping_path=RD_CATEGORY_MAPPING_PATH):
         self.category_mapping = self._load_category_mapping(category_mapping_path)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self._load_model(model_path)
@@ -279,113 +283,103 @@ processor_1, model_1, processor_2, model_2 = load_model(device)
 
 def run_hcfa_rd_pipeline(image_path: str):
     try:
+        global_start_time = time.time()
+        log_message(logger, "Starting HCFA RD pipeline", level="INFO")
+
+        # Log image path
+        log_message(logger, f"Received image path: {image_path}", level="INFO")
 
         print("got the image")
-        # image_path = os.path.join(input_image_folder, each_image)
+        # Load and convert the image
         pil_image = Image.open(image_path).convert('RGB')
-        # pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
         image_height, image_width = pil_image.size[0], pil_image.size[1]
         to_tensor = transforms.ToTensor()
         image = to_tensor(pil_image)
-        print("Converted to tensor")
-        """USE TWO MODEL TO HANDLE THE BLANK KEY 
-            - model_1 (old model)
-            - model_2 (new model)
-            - processor_1 (new processor)
-            - processor_2 (old processor)
+        log_message(logger, "Image loaded and converted to tensor", level="INFO")
 
-            convert_hcfa_predictions_to_df_old and
-            convert_hcfa_predictions_to_df_new
-
-        """
+        # Run old model prediction
+        log_message(logger, "Running prediction with old model", level="INFO")
         prediction_old, output = run_prediction_donut(pil_image, model_1, processor_1)
-        donut_out_old = convert_hcfa_predictions_to_df(prediction_old, version = "old")
-
-        from src.utils import merge_donut_outputs, add_missing_keys
+        donut_out_old = convert_hcfa_predictions_to_df(prediction_old, version="old")
         
-        ###### CHECK IF ANY KEY MISSING ######
+        log_message(logger, "Old model prediction complete", level="INFO")
+        log_message(logger, f"TIME TAKEN BY OLD MODEL {time.time() - global_start_time}", level="INFO")
+
+        # Check for missing keys and update
+        from src.utils import add_missing_keys
         donut_out_old = add_missing_keys(donut_out_old, key_mapping)
+        log_message(logger, "Missing keys handled in old model output", level="INFO")
 
+        # Run new model prediction
+        log_message(logger, "Running prediction with new model", level="INFO")
         prediction_new, output = run_prediction_donut(pil_image, model_2, processor_2)
-        donut_out_new = convert_hcfa_predictions_to_df(prediction_new, version = "new")
-        
-        ###### MERGE OLD AND NEW MODEL OUTPUT #######
+        donut_out_new = convert_hcfa_predictions_to_df(prediction_new, version="new")
+        log_message(logger, "New model prediction complete", level="INFO")
+        log_message(logger, f"TIME TAKEN BY NEW MODEL {time.time() - global_start_time}", level="INFO")
+
+        # Merge outputs from old and new models
         from src.utils import merge_donut_outputs
         donut_out = merge_donut_outputs(donut_out_old, donut_out_new, KEYS_FROM_OLD)
+        log_message(logger, "Merged old and new model outputs", level="INFO")
 
-        # This is just converting the dataframe to dictionary
+        # Convert merged output to dictionary
         json_data = donut_out.to_json(orient='records')
         data_list = json.loads(json_data)
-        # output_dict_donut = {item['Key']: item['Value'] for item in data_list}
-
         output_dict_donut = {}
 
-        # Iterate through the data_list
+        # Iterate through the data_list to create output_dict_donut
         for item in data_list:
             key = item['Key']
             value = item['Value']
-
-            # Check if the key already exists in the output dictionary
             if key in output_dict_donut:
-                # If the key exists, append the value to the list of dictionaries
                 output_dict_donut[key].append({'value': value})
             else:
-                # If the key doesn't exist, create a new list with the current value
                 output_dict_donut[key] = [{'value': value}]
+        
+        log_message(logger, "Donut output processed into dictionary", level="INFO")
 
-        # This is just doing the ROI inference and converting DF to dict
-        print("Startign ROI inference")
+        # Start ROI inference and convert results to dictionary
+        log_message(logger, "Starting ROI inference", level="INFO")
         res = roi_model_inference(image_path, image)
         df_dict = res.to_dict(orient='records')
 
-        # print(f"Printing class 23 value {df_dict['23_class']}")
-        # Path to the output JSON file
-
-        # Implementing the average part here
-
-        # # Convert the average coordinates DataFrame to a dictionary for easy access
-        # average_coordinates_dict = average_coordinates_hcfa_df.set_index('label').to_dict(orient='index')
-
-        # # Get all unique class names
-        # all_class_names = set(average_coordinates_hcfa_df['label'])
-
-        # Initialize the output dictionary
         output_dict_det = {}
-
         for item in df_dict:
             class_name = item['class_name']
             x1, y1, x2, y2 = item['x0'], item['y0'], item['x1'], item['y1']
             output_dict_det[class_name] = {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2}
+        
+        log_message(logger, "ROI inference complete", level="INFO")
 
-        # print("output_dict_det --->>", output_dict_det)
         # Map the ROI keys with the Donut keys
+        log_message(logger, "Mapping ROI keys with Donut keys", level="INFO")
         result_dict_1 = map_result1(output_dict_det, group_key_mapping_dict)
-        # print("result_dict_1  ---->>", result_dict_1)
 
-        print("Processing result_dict_2 --->>>")
+        log_message(logger, "Processing overlaps", level="INFO")
         result_dict_2 = map_result1(result_dict_1, mapping_overlaps)
 
-
+        # Add any required missing keys
         apply_19_key_post_processing = ['Box19A_Provider', '19B_ProvCredential', '19B_ProvSuffix', 'Box19B_Provider', '19B_ProvLName', '19A_ProvMI', '19A_ProvSuffix', '19A_ProvPrefix', 'Box19B_NPI', '19A_ProvLName', '19B_ProvMI', '19B_ProvFName', '19B_ProvFullNameQual', '19A_ProvFName', '19B_ProvPrefix', '19A_ProvFullNameQual', 'Box19A_QQ', "Box19B_QQ'", '19A_ProvCredential', 'Box19A_NPI']
         apply_8_pat_key_post_processing = ["8_PatStatus", "8_PatStudent"]
 
         for missing_keys in apply_19_key_post_processing:
-          result_dict_2[missing_keys] = {'x1': 1, 'y1': 1, 'x2': 100, 'y2': 100}
+            result_dict_2[missing_keys] = {'x1': 1, 'y1': 1, 'x2': 100, 'y2': 100}
 
         for missing_keys in apply_8_pat_key_post_processing:
-          result_dict_2[missing_keys] = {'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0}
+            result_dict_2[missing_keys] = {'x1': 0, 'y1': 0, 'x2': 0, 'y2': 0}
 
         result_dict_2["32_MedicaidTaxId"] = {'x1': 1, 'y1': 1, 'x2': image_height, 'y2': image_width}
 
-        # result_dict_2 = map_result2(output_dict_det, BBOX_DONUT_Mapping_Dict)
+        # Combine the results
         result_dict_2.update(result_dict_1)
+        final_mapping_dict = map_result1_final_output(result_dict_2, output_dict_donut)
 
-
-        final_mapping_dict  = map_result1_final_output(result_dict_2, output_dict_donut)
-
+        log_message(logger, "Pipeline processing complete", level="INFO")
+        log_message(logger, f"TIME TAKEN BY COMPLETE PIPELINE {time.time() - global_start_time}", level="INFO")
         return {"result": final_mapping_dict}, None
+
     except Exception as e:
-        print(e)
+        log_message(logger, f"Error in run_hcfa_rd_pipeline: {e}", level="ERROR")
         return None, str(e)
 
 if __name__ == "__main__":

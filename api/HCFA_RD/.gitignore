@@ -161,3 +161,5 @@ cython_debug/
 
 artifacts/
 images/
+api/HCFA_RD/logs/hcfa_logs.txt
+api\HCFA_RD\logs\

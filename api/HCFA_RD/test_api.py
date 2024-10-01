@@ -6,7 +6,7 @@ url = "http://localhost:5003/hcfa_extraction"
 
 # Define the payload data as a dictionary
 data = {
-    "FilePath": r"D:\project\FSL\FSL_codebase\api\HCFA\images\BSC7U49SO007_001.tiff"
+    "FilePath": r"D:\project\FSL\FSL_codebase\api\HCFA\images\BSC7N4PAO004_001.tiff"
 }
 
 try:

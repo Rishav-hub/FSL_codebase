@@ -1,5 +1,8 @@
 import pandas as pd
 
+import os
+from datetime import datetime
+
 def merge_donut_outputs(donut_out_old, donut_out_new, keys_from_old):
     """
     Combines the new donut output with values for certain keys taken from the old donut output.
@@ -55,3 +58,21 @@ def add_missing_keys(donut_out_old: pd.DataFrame, key_mapping: pd.DataFrame) -> 
     updated_donut_out_old = pd.concat([donut_out_old, missing_entries], ignore_index=True)
     
     return updated_donut_out_old
+
+def log_message(log_file: str, message: str):
+    """
+    Logs a message to a .txt file, creating the file if it doesn't exist.
+
+    Args:
+    - log_file (str): Path to the log file.
+    - message (str): The message to log.
+    """
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+    # Get the current timestamp for the log entry
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Open the file in append mode and write the message
+    with open(log_file, 'a') as f:
+        f.write(f"[{timestamp}] {message}\n")
