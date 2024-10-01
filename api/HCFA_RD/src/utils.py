@@ -25,3 +25,33 @@ def merge_donut_outputs(donut_out_old, donut_out_new, keys_from_old):
 
     # Return the combined DataFrame with updated values
     return donut_out_new[['Key', 'Value']]
+
+
+def add_missing_keys(donut_out_old: pd.DataFrame, key_mapping: pd.DataFrame) -> pd.DataFrame:
+
+    """
+    This function checks for missing keys from 'Modified_key' in 'donut_out_old' 
+    and adds them with value "[BLANK]".
+
+    Parameters:
+    - donut_out_old: DataFrame with columns ['Key', 'Value'].
+    - key_mapping: DataFrame with columns ['Key_Name', 'Modified_key'].
+
+    Returns:
+    - Updated 'donut_out_old' DataFrame with missing keys added.
+    """
+
+    # Extract the keys from donut_out_old and key_mapping
+    existing_keys = set(donut_out_old['Key'])
+    all_keys = set(key_mapping['Key_Name'])
+    
+    # Find keys that are in Modified_key but missing from donut_out_old
+    missing_keys = all_keys - existing_keys
+    
+    # Create a dataframe with missing keys and value as "[BLANK]"
+    missing_entries = pd.DataFrame({'Key': list(missing_keys), 'Value': "[BLANK]"})
+    
+    # Concatenate the original dataframe with the missing entries
+    updated_donut_out_old = pd.concat([donut_out_old, missing_entries], ignore_index=True)
+    
+    return updated_donut_out_old

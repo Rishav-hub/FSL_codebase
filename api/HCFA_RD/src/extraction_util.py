@@ -418,11 +418,15 @@ def run_hcfa_pipeline(image_path: str):
         prediction_old, output = run_prediction_donut(pil_image, model_1, processor_1)
         donut_out_old = convert_hcfa_predictions_to_df(prediction_old, version = "old")
 
+        from src.utils import merge_donut_outputs, add_missing_keys
+        
+        ###### CHECK IF ANY KEY MISSING ######
+        donut_out_old = add_missing_keys(donut_out_old, key_mapping)
+
         prediction_new, output = run_prediction_donut(pil_image, model_2, processor_2)
         donut_out_new = convert_hcfa_predictions_to_df(prediction_new, version = "new")
         
         ###### MERGE OLD AND NEW MODEL OUTPUT #######
-        from src.utils import merge_donut_outputs
         donut_out = merge_donut_outputs(donut_out_old, donut_out_new, KEYS_FROM_OLD)
 
         # What is this? Is it Mapping the donut keys to XML values? Can't understand.
