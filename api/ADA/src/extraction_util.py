@@ -18,75 +18,12 @@ import argparse
 import os
 import warnings
 from tqdm import tqdm
+from config import *
 
 
 warnings.filterwarnings('ignore')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-CATEGORY_MAPPING_PATH = r'D:\project\FSL\FSL_codebase\api\ADA\artifacts\notes.json'
-MODEL_PATH = r'D:\project\FSL\FSL_codebase\api\ADA\artifacts\ada__88.pth'
-ADA_FORM_KEY_MAPPING = r"D:\project\FSL\FSL_codebase\api\ADA\artifacts\FSL_Forms_Keys.xlsx"
-BBOX_DONUT_Mapping_Dict = {
-    "1_Type_of_Transaction":["DEN_TransTypeStmtOfServ","DEN_TransTypeReqforPreAuth","DEN_TransTypeEPSDT"],
-    "2_Pre_Number": "DEN_PreAuthNum",
-    "3_Company_address":["DEN_PayerAddr1","DEN_PayerCity","DEN_PayerPostCodeExt", "DEN_PayerOrgName",\
-                         "DEN_PayerFName","DEN_PayerLName", "DEN_PayerPhoneNumber", "DEN_PayerState", "DEN_PayerPostCode"],
-    "4_Other_Coverage":["DEN_IsThereSecInsN","DEN_IsThereSecInsY", "DEN_IsThereSecIns"],
-    "5_Name": "DEN_SecInsFullName",
-    "6_DOB":"DEN_SecInsDOB",
-    "7_Gender":["DEN_SecInsSexF","DEN_SecInsSexM"],
-    "8_SSN": "DEN_SecInsIDNumber",
-    "9_Plan_Number":"DEN_SecInsPolGrpNumber",
-    "10_Relationship":["DEN_SecRelShipDep","DEN_SecRelShipOther", "DEN_SecRelShipSelf", "DEN_SecRelShipSpouse"],
-    "11_Company_or_plan": ["DEN_SecInsOrgName","DEN_SecInsAddr1","DEN_SecInsCity", "DEN_SecPostCodeExt", "DEN_SecPhoneNumber", \
-                           "DEN_SecInsState", "DEN_SecInsPostCode"],
-    "12_Policyholder_details":["DEN_PriInsAddr1", "DEN_PriInsCity","DEN_PriInsFullName", "DEN_PriInsState", \
-                               "DEN_PriInsPostCode"],
-    "13_DOB":"DEN_PriInsDOB",
-    "14_Gender":["DEN_PriInsSexF","DEN_PriInsSexM"],
-    "15_SSN":"DEN_PriInsIDNumber",
-    "16_Plan_Number":"DEN_PriInsPolGrpNumber",
-    "17_Employer_Name":["DEN_PriInsPlanName","DEN_PriInsEmpName"],
-    "18_Relationship":["DEN_PatRelShipDep","DEN_PatRelShipOther","DEN_PatRelShipSelf","DEN_PatRelShipSpouse"],
-    "19_Use":["DEN_PatStudentStatusCodeFT", "DEN_PatStudentStatusCodePT"],
-    "20_Name":["DEN_PatAddr1","DEN_PatCity","DEN_PatFullName","DEN_PatState", "DEN_PatPostCode"],
-    "21_DOB":"DEN_PatDOB",
-    "22_Gender":["DEN_PatSexF","DEN_PatSexM"],
-    "23_Patient_ID":"DEN_PatAcctNo",
-    "24_31_Table":["DEN_DOS","DEN_CavityArea","DEN_ToothSystem","DEN_ToothId","DEN_ToothSurface","DEN_ProcCode",\
-                   "DEN_Units", "DEN_ProcDesc", "DEN_LineCharges"],
-    "31_A_Other_Fee":"DEN_OtherCharges",
-    "32_Total_Fee":"DEN_TotalCharges",
-    "33_Missing_Teeth":"DEN_MissingTooth",
-    "34_A_Diag_Codes":"21_ICDInd",
-    "34_Code_list_Qualifier": "DEN_DiagCodeQual",
-    "35_Remarks":["DEN_Remarks", "DEN_CHCCNum", "DEN_CHCNum", "DEN_DXCNum", "DEN_NEANum"],
-    "36_Signature":["DEN_PatSignonFile", "DEN_PatSignDate"],
-    "37_Signature":["DEN_PriSignonFile", "DEN_PriSignDate"],
-    "38_Place_of_treatment":"DEN_PlaceOfTreatment",
-    "39_Enclosures":"DEN_Encloseure",
-    "40_Orthodontics":["DEN_OrthodonticsN","DEN_OrthodonticsY"],
-    "41_Date":"DEN_DateAppliancePlaced",
-    "42_Months_remaining":"DEN_MnthsOfTrmntRemain",
-    "43_Prosthesis":["DEN_RplProsthesisN","DEN_RplProsthesisY"],
-    "44_Date":"DEN_DatePriorPlacement",
-    "45_Treatment_resulting_form":["DEN_PatConditionAuto", "DEN_PatConditionEmp", "DEN_PatConditionOther"],
-    "46_Date_of_accident":"DEN_DateOfAccident",
-    "47_Auto_Accident_state":"DEN_AutoAccidentState" ,
-    "48_Dentist_Address": ["DEN_BillProvAddr1", "DEN_BillProvCity", "DEN_BillProvFullName", "DEN_BillProvOrgName",\
-                           "DEN_BillProvPrefix", "DEN_BillProvState", "DEN_BillProvSuffix", "DEN_BillProvPostCode"],
-    "49_NPI":"DEN_BillProvNPI",
-    "50_Licence_Number": "DEN_BillProvLicenseId",
-    "51_SSN_TIN": "DEN_BillProvFedIdCode",
-    "52_A_Addl_Provider_id": "DEN_FacProvOtherIdFull",
-    "52_Phone_Number":"DEN_BillProvPhone",
-    "53_Signature": ["DEN_FacProvOrgName", "DEN_FacProvSignOnFile", "DEN_FacProvSignDate"],
-    "54_NPI": "DEN_FacProvNPI",
-    "55_Licence_Number": "DEN_FacProvLicenseId",
-    "56_Address":["DEN_FacProvAddr1","DEN_FacProvCity", "DEN_FacProvState", "DEN_FacProvPostCode", "DEN_FacProvSpecialtyCode"],
-    "57_Phone_Number":"DEN_FacProvPhone",
-    "58_Addl_provider_id":"DEN_FacProvPhone"
-}
 key_mapping = pd.read_excel(ADA_FORM_KEY_MAPPING)
 mapping_dict = key_mapping.set_index('Key_Name').to_dict()['Modified_key']
 reverse_mapping_dict = {v: k for k, v in mapping_dict.items()}
@@ -160,7 +97,9 @@ class DentalRoiPredictor:
 
         class_names = [self.category_mapping[label_id] for label_id in labels_flat]
         num_predictions = len(boxes_flat)
-        file_name = [image_path] * num_predictions
+        # file_name = [image_path] * num_predictions
+        file_name = [image_path.split(".")[0]] * num_predictions
+
 
         infer_df = pd.DataFrame({
             'file_name': file_name,
@@ -221,8 +160,8 @@ def split_and_expand(row):
 
 def load_model(device):
     try:
-        processor = AutoProcessor.from_pretrained("Laskari-Naveen/ADA_98")
-        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/ADA_98")
+        processor = AutoProcessor.from_pretrained("Laskari-Naveen/ADA_II_Oct")
+        model = VisionEncoderDecoderModel.from_pretrained("Laskari-Naveen/ADA_II_Oct")
         model.eval().to(device)
         print("Model loaded successfully")
     except:
@@ -336,11 +275,11 @@ processor, model = load_model(device)
 
 
 
-def run_ada_pipeline(image_path: str, file_name: str):
+def run_ada_pipeline(image_path: str):
     try:
         # image_path = os.path.join(input_image_folder, each_image)
-        # pil_image = Image.open(image_path).convert('RGB')
-        pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
+        pil_image = Image.open(image_path).convert('RGB')
+        # pil_image = Image.open(io.BytesIO(image_path)).convert('RGB')
         to_tensor = transforms.ToTensor()
         image = to_tensor(pil_image)
         prediction, output = run_prediction_donut(pil_image, model, processor)
@@ -368,10 +307,11 @@ def run_ada_pipeline(image_path: str, file_name: str):
                 output_dict_donut[key].append({'value': value})
             else:
                 # If the key doesn't exist, create a new list with the current value
-                output_dict_donut[key] = [{'value': value}]        
+                output_dict_donut[key] = [{'value': value}]  
 
+        print("Length of Keys being outputed", len(output_dict_donut.keys()))
         # This is just doing the ROI inference and converting DF to dict
-        res = roi_model_inference(file_name, image)
+        res = roi_model_inference(image_path, image)
         df_dict = res.to_dict(orient='records')
 
         # Now we just want that the classname should be the key and the values are the coordinates so 
