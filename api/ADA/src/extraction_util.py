@@ -181,8 +181,8 @@ def convert_predictions_to_df(prediction):
         result_df_each_image = pd.concat([each_image_output, expanded_df], ignore_index=True)
         result_df_each_image = result_df_each_image.drop(result_df_each_image[result_df_each_image['Value'].str.contains(';')].index)
 
-        for old_key, new_key in reverse_mapping_dict.items():
-            result_df_each_image["Key"].replace(old_key, new_key, inplace=True)
+        # for old_key, new_key in reverse_mapping_dict.items():
+        #     result_df_each_image["Key"].replace(old_key, new_key, inplace=True)
     except Exception as e:
         pass
         
